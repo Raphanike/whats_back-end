@@ -46,10 +46,7 @@ io.on('connection', (socket) => {
 
 // Conexão com o MongoDB Atlas
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB conectado');
     // Iniciar o servidor
