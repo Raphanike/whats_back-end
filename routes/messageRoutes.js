@@ -1,18 +1,31 @@
 const express = require('express')
-const Message = require('../models/message')
-const router = express.Router()
+const mongoose = require('mongoose')
+const cors = require('cors')
+const dotenv = require('dotenv')
+const authRoutes = require('./routes/authRoutes')
+const messageRoutes = require('./routes/messageRoutes') // ✅ aqui
 
-router.get('/:user1/:user2', async (req, res) => {
-    const { user1, user2 } = req.params
+dotenv.config()
 
-    const messages = await Message.find({
-        $or: [
-        { sender: user1, receiver: user2 },
-        { sender: user2, receiver: user1 }
-        ]
-    }).sort('timestamp')
+const app = express()
 
-    res.json(messages)
-})
+// Middleware
+app.use(cors())
+app.use(express.json())
 
-module.exports = router
+// Rotas
+app.use('/api/auth', authRoutes)
+app.use('/api/messages', messageRoutes) // ✅ aqui
+
+// Porta
+const PORT = process.env.PORT || 5000
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log('MongoDB conectado')
+        app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`)
+        })
+    })
+    .catch((err) => console.log('Erro ao conectar no MongoDB:', err))
